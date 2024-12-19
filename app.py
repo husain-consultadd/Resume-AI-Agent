@@ -196,7 +196,7 @@ with st.form(key="input_form", clear_on_submit=True):
     user_input = st.text_area(
         "",
         key="input",
-        height=60,
+        height=68,
         max_chars=None,
         placeholder="Type your message here...",
     )
