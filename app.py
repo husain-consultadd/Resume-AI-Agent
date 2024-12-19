@@ -291,5 +291,5 @@ if submit_button and user_input.strip():
         display_messages()
 
     except Exception as e:
-        add_message("assistant", "The request timed out. Please try again later.")
-        display_messages(e)
+        add_message("assistant", f"An unexpected error occurred: {e}")
+        display_messages()
