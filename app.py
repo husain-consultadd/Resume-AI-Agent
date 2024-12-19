@@ -290,12 +290,6 @@ if submit_button and user_input.strip():
         add_message("assistant", assistant_message)
         display_messages()
 
-    except openai.error.Timeout:
-        add_message("assistant", "The request timed out. Please try again later.")
-        display_messages()
-    except openai.error.APIError as e:
-        add_message("assistant", f"OpenAI API returned an API Error: {e}")
-        display_messages()
     except Exception as e:
-        add_message("assistant", f"An unexpected error occurred: {e}")
-        display_messages()
+        add_message("assistant", "The request timed out. Please try again later.")
+        display_messages(e)
