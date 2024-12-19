@@ -5,7 +5,7 @@ import openai
 import streamlit as st
 from dotenv import load_dotenv
 
-# Load environment variables from .env fil
+# Load environment variables from .env file
 load_dotenv()
 
 # Set OpenAI API key
@@ -15,24 +15,17 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 st.set_page_config(
     page_title="Tech Resume Crafter",
     page_icon="💼",
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="collapsed",
 )
 
+# Custom CSS for styling
 # Custom CSS for styling
 def local_css():
     st.markdown(
         """
         <style>
         /* General Body Styling */
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #343541;
-            color: #d1d5db;
-        }
-
-        /* Chat Header */
         .chat-header {
             background-color: #202123;
             padding: 10px 20px;
@@ -40,16 +33,26 @@ def local_css():
             color: #ffffff;
             font-size: 24px;
             font-weight: bold;
+            border-radius: 8px 8px 0 0;
         }
 
         /* Chat Window */
         .chat-window {
             background-color: #2d2f36;
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 0 0 8px 8px;
             height: 60vh;
             overflow-y: auto;
-            margin-bottom: 20px;
+            width: 100%;  /* Ensure it takes full width */
+            box-sizing: border-box;  /* Include padding in width */
+        }
+
+        /* Container for Chat and Input */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;  /* Set a max width for better readability */
+            margin: auto;  /* Center the container */
         }
 
         /* User Message */
@@ -61,6 +64,7 @@ def local_css():
             margin-bottom: 10px;
             max-width: 70%;
             align-self: flex-end;
+            word-wrap: break-word;
         }
 
         /* GPT Message */
@@ -72,6 +76,7 @@ def local_css():
             margin-bottom: 10px;
             max-width: 70%;
             align-self: flex-start;
+            word-wrap: break-word;
         }
 
         /* Input Section */
@@ -82,6 +87,9 @@ def local_css():
             padding: 12px;
             border-radius: 12px;
             box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            width: 100%;  /* Ensure it takes full width */
+            box-sizing: border-box;  /* Include padding in width */
         }
 
         /* Textarea Styling */
@@ -96,6 +104,7 @@ def local_css():
             resize: none;
             outline: none;
             max-height: 100px;
+            max-width: 600px;  /* Limit the maximum width */
         }
 
         textarea:focus {
@@ -148,10 +157,27 @@ def local_css():
         .chat-window::-webkit-scrollbar-track {
             background: #343541;
         }
+
+        /* Hide Streamlit's default styling for text areas and buttons */
+        .stTextArea > div > div > textarea {
+            height: 100px !important;
+            max-width: 600px !important;  /* Ensure the textarea doesn't exceed the max width */
+        }
+
+        .stButton > button {
+            display: none;
+        }
+
+        /* Center the chat container */
+        .streamlit-container {
+            display: flex;
+            justify-content: center;
+        }
         </style>
         """,
         unsafe_allow_html=True,
     )
+
 
 local_css()
 
@@ -163,18 +189,18 @@ if "messages" not in st.session_state:
 st.markdown('<div class="chat-header">Tech Resume Crafter</div>', unsafe_allow_html=True)
 
 # Chat window
-chat_window = st.container()
+chat_placeholder = st.empty()
 
 # Input section
 with st.form(key="input_form", clear_on_submit=True):
     user_input = st.text_area(
-        "Type your message here...",
+        "",
         key="input",
         height=60,
         max_chars=None,
         placeholder="Type your message here...",
     )
-    submit_button = st.form_submit_button(label="Send")
+    submit_button = st.form_submit_button(label="Send", type="primary")
 
 # Function to add messages to the chat
 def add_message(role, content):
@@ -182,14 +208,14 @@ def add_message(role, content):
 
 # Function to display messages
 def display_messages():
-    with chat_window:
-        st.markdown('<div class="chat-window">', unsafe_allow_html=True)
-        for msg in st.session_state.messages:
-            if msg["role"] == "user":
-                st.markdown(f'<div class="user-message">{msg["content"]}</div>', unsafe_allow_html=True)
-            else:
-                st.markdown(f'<div class="gpt-message">{msg["content"]}</div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
+    chat_content = '<div class="chat-window">'
+    for msg in st.session_state.messages:
+        if msg["role"] == "user":
+            chat_content += f'<div class="user-message">{msg["content"]}</div>'
+        else:
+            chat_content += f'<div class="gpt-message">{msg["content"]}</div>'
+    chat_content += '</div>'
+    chat_placeholder.markdown(chat_content, unsafe_allow_html=True)
 
 # Display existing messages
 display_messages()
@@ -255,11 +281,9 @@ if submit_button and user_input.strip():
     try:
         # Call OpenAI API
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=messages,
-            temperature=0.7,
-            max_tokens=1000,
-            timeout=60,
+            max_tokens=10000,
         )
 
         assistant_message = response.choices[0].message.content.strip()
