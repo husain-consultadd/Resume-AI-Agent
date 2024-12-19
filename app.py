@@ -99,12 +99,13 @@ def local_css():
             background-color: #565869;
             color: #ffffff;
             padding: 12px 15px;
-            border-radius: 24px;
+            border-radius: 12px;
             font-size: 16px;
             resize: none;
             outline: none;
             max-height: 100px;
-            max-width: 600px;  /* Limit the maximum width */
+            width: 100%; /* Ensure it takes full width */
+            box-sizing: border-box; /* Include padding in width calculation */
         }
 
         textarea:focus {
@@ -114,6 +115,7 @@ def local_css():
         textarea::placeholder {
             color: #9ca3af;
         }
+
 
         /* Send Button Styling */
         .send-button {
