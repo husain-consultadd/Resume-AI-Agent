@@ -1,297 +1,296 @@
-# app.py
+# import os
+# import openai
+# import streamlit as st
+# from dotenv import load_dotenv
+
+# # Load environment variables from .env file
+# load_dotenv()
+
+# # Set OpenAI API key
+# openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# # Streamlit page configuration
+# st.set_page_config(
+#     page_title="Tech Resume Crafter",
+#     page_icon="\U0001F4BC",
+#     layout="wide",
+# )
+
+# # Add custom CSS for centering the heading and styling user messages
+# st.markdown("""
+#     <style>
+#     .center-heading {
+#         text-align: center;
+#         font-size: 36px;
+#         font-weight: bold;
+#         color: white;
+#         margin-top: 20px;
+#         margin-bottom: 20px;
+#     }
+#     .chat-container {
+#         display: flex;
+#         align-items: flex-start;
+#         margin: 10px 0;
+#     }
+#     .chat-icon {
+#         width: 40px;
+#         height: 40px;
+#         border-radius: 50%;
+#         margin-right: 10px;
+#         overflow: hidden;
+#     }
+#     .chat-icon img {
+#         width: 100%;
+#         height: 100%;
+#         object-fit: cover;
+#     }
+#     .user-message {
+#         background-color: #007BFF; /* Blue background */
+#         border-radius: 10px;
+#         padding: 10px;
+#         margin: 5px 0;
+#         color: white; /* White text color */
+#         font-size: 16px;
+#         line-height: 1.5;
+#         max-width: 80%;
+#         word-wrap: break-word;
+#     }
+#     </style>
+#     """, unsafe_allow_html=True)
+
+# # Display the heading at the center
+# st.markdown("<div class='center-heading'>Tech Resume Crafter</div>", unsafe_allow_html=True)
+
+# # Initialize session state for chat history
+# if "messages" not in st.session_state:
+#     st.session_state.messages = []  # List to store chat messages
+
+# # Function to add messages to the chat
+# def add_message(role, content):
+#     st.session_state.messages.append({"role": role, "content": content})
+
+# # Custom user icon URL
+# USER_ICON_URL = "https://media.licdn.com/dms/image/v2/D560BAQHl70ESPZeYlw/company-logo_200_200/company-logo_200_200/0/1704214380639?e=1743033600&v=beta&t=zN3f1pPCbkuk5T0zq3mRGjF2p7rYWSDiEn03xJ0n1P0"
+
+# # Render all chat messages
+# for msg in st.session_state.messages:
+#     if msg["role"] == "user":
+#         st.markdown(f"""
+#             <div class="chat-container">
+#                 <div class="chat-icon">
+#                     <img src="{USER_ICON_URL}" alt="User Icon">
+#                 </div>
+#                 <div class="user-message">{msg['content']}</div>
+#             </div>
+#             """, unsafe_allow_html=True)
+#     else:
+#         with st.chat_message(msg["role"]):
+#             st.markdown(msg["content"])
+
+# # Input for user to type a message
+# if user_input := st.chat_input("Type your message here..."):
+#     add_message("user", user_input)  # Add user's message to history
+
+#     # Display the user's message with custom styling and image
+#     st.markdown(f"""
+#         <div class="chat-container">
+#             <div class="chat-icon">
+#                 <img src="{USER_ICON_URL}" alt="User Icon">
+#             </div>
+#             <div class="user-message">{user_input}</div>
+#         </div>
+#         """, unsafe_allow_html=True)
+
+#     # Prepare messages for the assistant
+#     system_prompt = "You are a specialized AI designed to generate tailored, high-impact technical resume content for job seekers applying to various tech roles. Your primary goal is to create unique, detailed, and role-specific project descriptions or experience summaries whose total ATS score according to JD should be greater than 95 out of 100. Follow these instructions carefully: 1. Gather Initial Information: * Ask for the Job Description (JD): Prompt the user to provide the complete JD for the role they are targeting. * Job Level Analysis: Determine if the JD is for a junior-level or senior-level position. * For junior roles, focus on creating projects from scratch to showcase technical expertise. * For senior roles, emphasize improvements and optimizations made to existing systems to highlight leadership and innovation. 2. Tech Stack Extraction: * Analyze the JD to identify the key technical stacks (programming languages, frameworks, tools, etc.) associated with the role. * Suggest additional or complementary technologies that might be required to complete the project fully. * Ensure these tools are aligned with the company's ecosystem (e.g., if the company uses Azure, avoid suggesting AWS). 3. Project Details Collection: * Ask the user for the project title and a brief description of the project they want to include in the resume. * Based on the provided tech stack and project description, generate the following content: * Problem Statement: Clearly define the issue the project addresses. * Approach: Explain the steps and strategies used to develop the project. * Experience Bullet Points: Describe the project in detail using bullet points. 4. Content Guidelines: * Avoid Redundant Tools: Do not include technologies that serve the same purpose in a single project (e.g., avoid pairing MySQL and PostgreSQL in the same context unless justified). * Unique Content: Ensure each bullet point is distinct, avoiding repetitive phrasing and ideas. * Technical Language: Use precise and advanced technical terminology to describe tools, methodologies, and outcomes. * Bullet Point Format: * Provide 15 to 25 bullet points per project each bullet point. * Each bullet point should be 2 to 3 lines without subheading. * No subheadings within the bullet points. 5. Role-Specific Focus: * For junior-level roles, emphasize: * Developing projects from the ground up. * Demonstrating technical skills, problem-solving abilities, and a thorough understanding of the development process. * For senior-level roles, highlight: * Enhancements made to existing systems. * Efficiency improvements, scalability, and technical leadership. * Contributions to the company's workflow optimization or system architecture. 6. Provide ATS Evaluation: Review the Generated Content against the JD to provide an ATS score and feedback. Follow this structure: 1. Percentage Match: Calculate and display the percentage match between the content and the JD. 2. Missing Keywords: Identify important keywords or skills missing from the content that are present in the JD. 3. Final Thoughts: Provide an evaluation summary highlighting the strengths and weaknesses of the generated content in relation to the JD."
+#     conversation = [{"role": "system", "content": system_prompt}] + st.session_state.messages
+
+#     # Display a placeholder while generating the assistant's response
+#     with st.chat_message("assistant"):
+#         response_placeholder = st.empty()
+#         with st.spinner("Crafting a response..."):
+#             try:
+#                 # Call OpenAI API
+#                 response = openai.ChatCompletion.create(
+#                     model="gpt-4",
+#                     messages=conversation,
+#                     max_tokens=1000,
+#                 )
+#                 assistant_message = response.choices[0].message.content.strip()
+#             except Exception as e:
+#                 assistant_message = f"An error occurred: {e}"
+
+#             # Replace the placeholder with the actual response
+#             response_placeholder.markdown(assistant_message)
+
+#     # Add assistant's response to the message history
+#     add_message("assistant", assistant_message)
+
 
 import os
 import openai
 import streamlit as st
 from dotenv import load_dotenv
+from groq import Groq  # Import Groq client for LLAMA model
 
 # Load environment variables from .env file
 load_dotenv()
 
 # Set OpenAI API key
 openai.api_key = os.getenv("OPENAI_API_KEY")
+groq_api_key = os.getenv("GROQ_API_KEY")
 
 # Streamlit page configuration
 st.set_page_config(
     page_title="Tech Resume Crafter",
-    page_icon="💼",
+    page_icon="\U0001F4BC",
     layout="wide",
-    initial_sidebar_state="collapsed",
 )
 
-# Custom CSS for styling
-# Custom CSS for styling
-def local_css():
-    st.markdown(
-        """
-        <style>
-        /* General Body Styling */
-        .chat-header {
-            background-color: #202123;
-            padding: 10px 20px;
-            text-align: center;
-            color: #ffffff;
-            font-size: 24px;
-            font-weight: bold;
-            border-radius: 8px 8px 0 0;
-        }
+# Add custom CSS for centering the heading and styling user messages
+st.markdown("""
+    <style>
+    .center-heading {
+        text-align: center;
+        font-size: 36px;
+        font-weight: bold;
+        color: white;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .chat-container {
+        display: flex;
+        align-items: flex-start;
+        margin: 10px 0;
+    }
+    .chat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+        overflow: hidden;
+    }
+    .chat-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .user-message {
+        background-color: #007BFF;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 5px 0;
+        color: white;
+        font-size: 16px;
+        line-height: 1.5;
+        max-width: 80%;
+        word-wrap: break-word;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-        /* Chat Window */
-        .chat-window {
-            background-color: #2d2f36;
-            padding: 15px;
-            border-radius: 0 0 8px 8px;
-            height: 60vh;
-            overflow-y: auto;
-            width: 100%;  /* Ensure it takes full width */
-            box-sizing: border-box;  /* Include padding in width */
-        }
-
-        /* Container for Chat and Input */
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            max-width: 800px;  /* Set a max width for better readability */
-            margin: auto;  /* Center the container */
-        }
-
-        /* User Message */
-        .user-message {
-            background-color: #1a73e8;
-            color: #ffffff;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            max-width: 70%;
-            align-self: flex-end;
-            word-wrap: break-word;
-        }
-
-        /* GPT Message */
-        .gpt-message {
-            background-color: #3e3f4b;
-            color: #ffffff;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            max-width: 70%;
-            align-self: flex-start;
-            word-wrap: break-word;
-        }
-
-        /* Input Section */
-        .input-section {
-            display: flex;
-            align-items: center;
-            background-color: #40414f;
-            padding: 12px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-            width: 100%;  /* Ensure it takes full width */
-            box-sizing: border-box;  /* Include padding in width */
-        }
-
-        /* Textarea Styling */
-        textarea {
-            flex: 1;
-            border: none;
-            background-color: #565869;
-            color: #ffffff;
-            padding: 12px 15px;
-            border-radius: 12px;
-            font-size: 16px;
-            resize: none;
-            outline: none;
-            max-height: 100px;
-            width: 100%; /* Ensure it takes full width */
-            box-sizing: border-box; /* Include padding in width calculation */
-        }
-
-        textarea:focus {
-            background-color: #6b6d7b;
-        }
-
-        textarea::placeholder {
-            color: #9ca3af;
-        }
-
-
-        /* Send Button Styling */
-        .send-button {
-            background-color: #1a73e8;
-            border: none;
-            color: #ffffff;
-            cursor: pointer;
-            margin-left: 10px;
-            padding: 10px;
-            border-radius: 50%;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s, transform 0.2s;
-        }
-
-        .send-button:hover {
-            background-color: #1669d4;
-            transform: scale(1.1);
-        }
-
-        .send-button:active {
-            transform: scale(1);
-        }
-
-        /* Scrollbar Styling */
-        .chat-window::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .chat-window::-webkit-scrollbar-thumb {
-            background: #565869;
-            border-radius: 4px;
-        }
-
-        .chat-window::-webkit-scrollbar-thumb:hover {
-            background: #737682;
-        }
-
-        .chat-window::-webkit-scrollbar-track {
-            background: #343541;
-        }
-
-        /* Hide Streamlit's default styling for text areas and buttons */
-        .stTextArea > div > div > textarea {
-            height: 100px !important;
-            max-width: 600px !important;  /* Ensure the textarea doesn't exceed the max width */
-        }
-
-        .stButton > button {
-            display: none;
-        }
-
-        /* Center the chat container */
-        .streamlit-container {
-            display: flex;
-            justify-content: center;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-local_css()
+# Display the heading at the center
+st.markdown("<div class='center-heading'>Tech Resume Crafter</div>", unsafe_allow_html=True)
 
 # Initialize session state for chat history
 if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-# Header
-st.markdown('<div class="chat-header">Tech Resume Crafter</div>', unsafe_allow_html=True)
-
-# Chat window
-chat_placeholder = st.empty()
-
-# Input section
-with st.form(key="input_form", clear_on_submit=True):
-    user_input = st.text_area(
-        "",
-        key="input",
-        height=68,
-        max_chars=None,
-        placeholder="Type your message here...",
-    )
-    submit_button = st.form_submit_button(label="Send", type="primary")
+    st.session_state.messages = []  # List to store chat messages
 
 # Function to add messages to the chat
 def add_message(role, content):
     st.session_state.messages.append({"role": role, "content": content})
 
-# Function to display messages
-def display_messages():
-    chat_content = '<div class="chat-window">'
-    for msg in st.session_state.messages:
-        if msg["role"] == "user":
-            chat_content += f'<div class="user-message">{msg["content"]}</div>'
-        else:
-            chat_content += f'<div class="gpt-message">{msg["content"]}</div>'
-    chat_content += '</div>'
-    chat_placeholder.markdown(chat_content, unsafe_allow_html=True)
+# Custom user icon URL
+USER_ICON_URL = "https://media.licdn.com/dms/image/v2/D560BAQHl70ESPZeYlw/company-logo_200_200/company-logo_200_200/0/1704214380639?e=1743033600&v=beta&t=zN3f1pPCbkuk5T0zq3mRGjF2p7rYWSDiEn03xJ0n1P0"
 
-# Display existing messages
-display_messages()
+# Model selection dropdown
+model_option = st.sidebar.selectbox("Choose LLM Model", ["OpenAI", "LLAMA"])
 
-# Handle form submission
-if submit_button and user_input.strip():
-    add_message("user", user_input.strip())
-    display_messages()
+# Function to handle message submission and generate a response
+def generate_response(model, chat_history):
+    if model == "OpenAI":
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-4o",
+                messages=chat_history,
+                max_tokens=10000,
+            )
+            return response['choices'][0]['message']['content'].strip()
+        except Exception as e:
+            return f"An error occurred: {e}"
+    elif model == "LLAMA":
+        try:
+            groq_client = Groq(api_key=groq_api_key)
+            chat_completion = groq_client.chat.completions.create(
+                model="llama3-70b-8192",
+                messages=chat_history,
+            )
+            return chat_completion.choices[0].message.content.strip()
+        except Exception as e:
+            return f"An error occurred: {e}"
 
-    # System Prompt
-    system_prompt = (
-        "TASK: "
-        "1. Gather Initial Information: "
-        "* Ask for the Job Description (JD): Prompt the user to provide the complete JD for the role they are targeting. "
-        "* Job Level Analysis: Determine if the JD is for a junior-level or senior-level position. "
-        "  * For junior roles, focus on creating projects from scratch to showcase technical expertise. "
-        "2. Tech Stack Extraction: "
-        "* Analyze the JD to identify the key technical stacks (programming languages, frameworks, tools, etc.) associated with the role. "
-        "* Suggest additional or complementary technologies that might be required to complete the project fully. "
-        "* Ensure these tools are aligned with the company's ecosystem (e.g., if the company uses Azure, avoid suggesting AWS). "
-        "3. Project Details Collection: "
-        "* Ask the user for the project title and a brief description of the project they want to include in the resume. "
-        "* Based on the provided tech stack and project description, generate the following content: "
-        "  * Problem Statement: Clearly define the issue the project addresses. "
-        "  * Approach: Explain the steps and strategies used to develop the project. "
-        "* Experience Bullet Points: Describe the project in detail using bullet points. "
-        "4. Content Guidelines: "
-        "* Avoid Redundant Tools: Do not include technologies that serve the same purpose in a single project (e.g., avoid pairing MySQL and PostgreSQL in the same context unless justified). "
-        "* Unique Content: Ensure each bullet point is distinct, avoiding repetitive phrasing and ideas. "
-        "* Technical Language: Use precise and advanced technical terminology to describe tools, methodologies, and outcomes. "
-        "* Bullet Point Format: "
-        "  * Provide 10 to 15 bullet points per project (approximately 900-1000 words total). "
-        "  * Each bullet point should be 25-40 words in length. "
-        "  * No subheadings within the bullet points. "
-        "5. Role-Specific Focus: "
-        "* For junior-level roles, emphasize: "
-        "  * Developing projects from the ground up. "
-        "  * Demonstrating technical skills, problem-solving abilities, and a thorough understanding of the development process. "
-        "* For senior-level roles, highlight: "
-        "  * Enhancements made to existing systems. "
-        "  * Efficiency improvements, scalability, and technical leadership. "
-        "  * Contributions to the company's workflow optimization or system architecture. "
-        "6. Provide ATS Evaluation: "
-        "  Review the Generated Content against the JD to provide an ATS score and feedback. Follow this structure: "
-        " 1. Percentage Match: Calculate and display the percentage match between the content and the JD. "
-        " 2. Missing Keywords: Identify important keywords or skills missing from the content that are present in the JD. "
-        " 3. Final Thoughts: Provide an evaluation summary highlighting the strengths and weaknesses of the generated content in relation to the JD. "
-        "Example Output Template: "
-        "* [Bullet Point 1]: Designed and implemented a scalable microservices architecture using Python and Docker to optimize service deployment and management. "
-        "* [Bullet Point 2]: Developed REST APIs with Flask and PostgreSQL to facilitate seamless data exchange, reducing latency by 25%. "
-        "* [Bullet Point 3]: Integrated CI/CD pipelines using Jenkins and GitHub Actions to automate testing and deployment, increasing code delivery speed by 40%. "
-        "1. ATS Evaluation: "
-        "* Match Percentage: e.g., 'Your resume matches the JD by 85%.' "
-        "* Missing Keywords: e.g., 'Missing Keywords: Docker, Kubernetes, CI/CD.' "
-        "* Final Thoughts: e.g., 'Your profile aligns well with the role, but incorporating more DevOps tools would strengthen your fit.'"
-    )
+# Display chat history
+for msg in st.session_state.messages:
+    if msg["role"] == "user":
+        st.markdown(f"""
+            <div class="chat-container">
+                <div class="chat-icon">
+                    <img src="{USER_ICON_URL}" alt="User Icon">
+                </div>
+                <div class="user-message">{msg['content']}</div>
+            </div>
+            """, unsafe_allow_html=True)
+    else:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
 
-    # Prepare the messages for OpenAI
-    messages = [{"role": "system", "content": system_prompt}]
-    for msg in st.session_state.messages:
-        messages.append({"role": msg["role"], "content": msg["content"]})
+# Input for user to type a message
+if user_input := st.chat_input("Type your message here..."):
+    add_message("user", user_input)  # Add user's message to history
 
-    try:
-        # Call OpenAI API
-        response = openai.ChatCompletion.create(
-            model="gpt-4o",
-            messages=messages,
-            max_tokens=10000,
+    # Display the user's message with custom styling and image
+    st.markdown(f"""
+        <div class="chat-container">
+            <div class="chat-icon">
+                <img src="{USER_ICON_URL}" alt="User Icon">
+            </div>
+            <div class="user-message">{user_input}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Prepare messages for the assistant, including the system prompt
+    system_prompt = {
+        "role": "system",
+        "content": (
+            "You are a specialized AI designed to generate tailored, high-impact technical resume content for job seekers applying to various tech roles. "
+            "Primary goal is to create unique, detailed, role-specific content that achieves a high ATS (Applicant Tracking System) match score while maintaining natural readability. "
+            "Follow instructions carefully and present content in bullet points (2-3 lines each). Guidelines and instructions: "
+            "1. Gather initial information, including job description (JD) and role seniority level (Junior, Mid-Level, Senior). "
+            "2. Extract and align the tech stack with the JD, avoiding redundant or conflicting tools. "
+            "3. Generate detailed project descriptions, focusing on problem statements, approaches, and results each with seperate heading and corresponding data. "
+            "4. Structure content with 10-15, ATS-optimized bullet points (30-40 words each), using quantifiable metrics in the last 2-3 points. "
+            "5. Customize content based on the role's focus: Junior (technical skills, end-to-end projects), Mid-Level (ownership and collaboration), or Senior (leadership, scalability, efficiency). "
+            "6. Perform ATS evaluation to provide a match percentage, missing keywords, and recommendations for improvement."
         )
+    }
 
-        assistant_message = response.choices[0].message.content.strip()
-        add_message("assistant", assistant_message)
-        display_messages()
+    chat_history = [system_prompt] + st.session_state.messages
 
-    except Exception as e:
-        add_message("assistant", f"An unexpected error occurred: {e}")
-        display_messages()
+    # Display a placeholder while generating the assistant's response
+    with st.chat_message("assistant"):
+        response_placeholder = st.empty()
+        with st.spinner("Crafting a response..."):
+            response = generate_response(model_option, chat_history)
+
+            # Replace the placeholder with the actual response
+            response_placeholder.markdown(response)
+
+    # Add assistant's response to the message history
+    add_message("assistant", response)
+
+
+
+
+
+
+
